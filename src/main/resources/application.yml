@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: Demo-E-Commerce
+  datasource:
+    url: jdbc:mysql://localhost:3306/e_commerce_management
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:123456}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
