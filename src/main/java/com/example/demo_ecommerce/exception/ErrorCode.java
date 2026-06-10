@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ErrorCode {
     USER_EXISTED(409, "User existed", HttpStatus.CONFLICT),
+    USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(401, "Unauthorized", HttpStatus.UNAUTHORIZED),
     GENERATE_JWT_ERROR(500, "Generate JWT Error", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_JWT_TOKEN(502, "Only Access Token Is Allow", HttpStatus.UNAUTHORIZED),
     ROLE_INVALID(400,  "Invalid Role", HttpStatus.BAD_REQUEST),
     ;
     private int code;

@@ -2,15 +2,13 @@ package com.example.demo_ecommerce.controller;
 
 import com.example.demo_ecommerce.dto.request.UserRegisterRequest;
 import com.example.demo_ecommerce.dto.response.ApiResponse;
+import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
 import com.example.demo_ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,11 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserService userService;
     @PostMapping("/register")
-    public ApiResponse<UserDetailResponse> register(@RequestBody @Valid UserRegisterRequest request) throws Exception {
+    public ApiResponse<UserDetailResponse> register(@RequestBody @Valid UserRegisterRequest request) {
         var data = userService.registerUser(request);
         return ApiResponse.<UserDetailResponse>builder()
                 .code(201)
                 .message("User registered successfully!")
+                .data(data)
+                .build();
+    }
+    @GetMapping("/list")
+    public ApiResponse<PageResponse<UserDetailResponse>> getAllUsers(@RequestParam(required = false,defaultValue = "1") int page,
+                                                                     @RequestParam(required = false,defaultValue = "10") int size,
+                                                                     @RequestParam(required = false)String email,
+                                                                     @RequestParam(required = false) String fullName,
+                                                                     @RequestParam(required = false,defaultValue = "") String phoneNumber) {
+        var data = userService.getUsers(page, size, email, fullName, phoneNumber);
+        return ApiResponse.<PageResponse<UserDetailResponse>>builder()
+                .code(200)
+                .message("get users successfully")
                 .data(data)
                 .build();
     }

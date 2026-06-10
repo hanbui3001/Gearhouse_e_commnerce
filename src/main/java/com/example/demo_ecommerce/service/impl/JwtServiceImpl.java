@@ -22,19 +22,20 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.secret-key}")
     private String secretKey;
 
+
     @Override
-    public String generateToken(String userId, long time, ChronoUnit unit, String type) {
+    public String generateAccessToken(String userId) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
 
 
         //payload
         Date now = new Date();
-        Date expiration = Date.from(now.toInstant().plus(time, unit));
+        Date expiration = Date.from(now.toInstant().plus(30, ChronoUnit.HOURS));
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(userId)
                 .issueTime(now)
                 .expirationTime(expiration)
-                .claim("type", type)
+                .audience("access")
                 .build();
 
         SignedJWT jwt = new SignedJWT(jwsHeader, claimsSet);
@@ -44,17 +45,31 @@ public class JwtServiceImpl implements JwtService {
         } catch (JOSEException e) {
             throw new CustomException(ErrorCode.GENERATE_JWT_ERROR);
         }
-    }
-
-    @Override
-    public String generateAccessToken(String userId) {
-        return generateToken(userId, 5, ChronoUnit.MINUTES, "access");
 
     }
 
     @Override
     public String generateRefreshToken(String userId) {
-        return generateToken(userId, 5, ChronoUnit.DAYS, "refresh");
+        JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
+
+
+        //payload
+        Date now = new Date();
+        Date expiration = Date.from(now.toInstant().plus(10, ChronoUnit.DAYS));
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .subject(userId)
+                .issueTime(now)
+                .expirationTime(expiration)
+                .audience("refresh")
+                .build();
+
+        SignedJWT jwt = new SignedJWT(jwsHeader, claimsSet);
+        try {
+            jwt.sign(new MACSigner(secretKey));
+            return jwt.serialize();
+        } catch (JOSEException e) {
+            throw new CustomException(ErrorCode.GENERATE_JWT_ERROR);
+        }
 
     }
 }
