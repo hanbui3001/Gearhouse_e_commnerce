@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Table(name = "cart_items")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CartItem {
+public class CartItem extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
