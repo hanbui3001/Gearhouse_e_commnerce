@@ -13,3 +13,10 @@ spring:
         show_sql: true
 jwt:
   secret-key: ${JWT_SECRET_KEY}
+  issuer: http://localhost:8080
+
+web:
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
+    phone: ${ADMIN_PHONE_NUMBER}

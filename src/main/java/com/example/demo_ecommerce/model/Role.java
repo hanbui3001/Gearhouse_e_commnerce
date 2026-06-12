@@ -13,13 +13,12 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Role {
+public class Role extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
     String name;
     String description;
-    @ManyToMany(mappedBy = "roles")
-    Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    Set<UserRole> userRoles = new HashSet<>();
 }
