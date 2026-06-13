@@ -19,6 +19,7 @@ public record UserRegisterRequest(
         @NotBlank(message = "password is required")
         @Size(min = 6, message = "password is greater than 6 characters")
         String password,
+        @NotBlank
         @NotBlank(message = "full name is required")
         String fullName,
         @NotBlank(message = "phone number is required")

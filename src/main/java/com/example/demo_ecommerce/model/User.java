@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -40,11 +40,21 @@ public class User extends BaseEntity implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @Builder.Default
     Set<UserRole> userRoles = new HashSet<>();
+    public void addRole(Role role) {
+        this.userRoles.add(UserRole.builder()
+                        .user(this)
+                .role(role)
+                .build());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+
+        return userRoles.stream()
+                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getName()))
+                .toList();
     }
 
     @Override
