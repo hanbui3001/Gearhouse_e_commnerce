@@ -3,6 +3,7 @@ package com.example.demo_ecommerce.service.impl;
 import com.example.demo_ecommerce.enums.Token;
 import com.example.demo_ecommerce.exception.CustomException;
 import com.example.demo_ecommerce.exception.ErrorCode;
+import com.example.demo_ecommerce.model.User;
 import com.example.demo_ecommerce.service.JwtService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEHeader;
@@ -13,10 +14,16 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
@@ -25,18 +32,21 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.issuer}")
     private String issuer;
     @Override
-    public String generateAccessToken(String userId) {
+    public String generateAccessToken(User user) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
 
-
+        List<String> authorities = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
         //payload
         Date now = new Date();
         Date expiration = Date.from(now.toInstant().plus(30, ChronoUnit.HOURS));
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(userId)
+                .subject(user.getEmail())
                 .issuer(this.issuer)
                 .issueTime(now)
                 .expirationTime(expiration)
+                .claim("authorities", authorities)
                 .claim("typ", Token.ACCESS.name())
                 .build();
 

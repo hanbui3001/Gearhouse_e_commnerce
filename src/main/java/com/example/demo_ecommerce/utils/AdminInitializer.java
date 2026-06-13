@@ -8,6 +8,7 @@ import com.example.demo_ecommerce.model.UserRole;
 import com.example.demo_ecommerce.repository.RoleRepository;
 import com.example.demo_ecommerce.repository.UserRepository;
 import com.example.demo_ecommerce.repository.UserRoleRepository;
+import com.example.demo_ecommerce.service.RoleService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,8 +24,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class AdminInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final UserRoleRepository userRoleRepository;
+    private final RoleService roleService;
     private final PasswordEncoder encoder;
     @Value("${web.admin.username}")
     private String email;
@@ -36,13 +36,7 @@ public class AdminInitializer implements ApplicationRunner {
     @Override
     @Transactional
     public void run(@NonNull ApplicationArguments args) {
-        Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN.name())
-                .orElseGet(() -> roleRepository.save(
-                        Role.builder()
-                                .name(RoleName.ROLE_ADMIN.name())
-                                .description("Admin role")
-                                .build()
-                ));
+        Role adminRole = roleService.findRoleByNameOrCreate(RoleName.ROLE_ADMIN);
         User admin = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                          User adminUser = User.builder()
@@ -55,12 +49,7 @@ public class AdminInitializer implements ApplicationRunner {
                             .build();
                          return userRepository.save(adminUser);
                 });
-
-        if (!userRoleRepository.existsByUserAndRole(admin, adminRole)) {
-            userRoleRepository.save(UserRole.builder()
-                    .user(admin)
-                    .role(adminRole)
-                    .build());
-        }
+        admin.addRole(adminRole);
+        userRepository.save(admin);
     }
 }
