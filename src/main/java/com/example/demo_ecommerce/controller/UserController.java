@@ -8,6 +8,8 @@ import com.example.demo_ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,6 +36,15 @@ public class UserController {
         return ApiResponse.<PageResponse<UserDetailResponse>>builder()
                 .code(200)
                 .message("get users successfully")
+                .data(data)
+                .build();
+    }
+    @GetMapping("/profile")
+    public ApiResponse<UserDetailResponse> getPProfile(@AuthenticationPrincipal Jwt jwt) {
+        var data = userService.getMyProfile(jwt);
+        return ApiResponse.<UserDetailResponse>builder()
+                .code(200)
+                .message("get my profile successfully")
                 .data(data)
                 .build();
     }
