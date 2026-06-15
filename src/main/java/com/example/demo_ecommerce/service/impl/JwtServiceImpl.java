@@ -1,28 +1,26 @@
 package com.example.demo_ecommerce.service.impl;
 
-import com.example.demo_ecommerce.enums.Token;
+import com.example.demo_ecommerce.enums.TokenType;
 import com.example.demo_ecommerce.exception.CustomException;
 import com.example.demo_ecommerce.exception.ErrorCode;
 import com.example.demo_ecommerce.model.User;
 import com.example.demo_ecommerce.service.JwtService;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEHeader;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,22 +30,18 @@ public class JwtServiceImpl implements JwtService {
     @Value("${jwt.issuer}")
     private String issuer;
     @Override
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(String userId, List<String> authorities) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
-
-        List<String> authorities = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
         //payload
         Date now = new Date();
         Date expiration = Date.from(now.toInstant().plus(30, ChronoUnit.HOURS));
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
+                .subject(userId)
                 .issuer(this.issuer)
                 .issueTime(now)
                 .expirationTime(expiration)
                 .claim("authorities", authorities)
-                .claim("typ", Token.ACCESS.name())
+                .claim("typ", TokenType.ACCESS.name())
                 .build();
 
         SignedJWT jwt = new SignedJWT(jwsHeader, claimsSet);
@@ -73,7 +67,7 @@ public class JwtServiceImpl implements JwtService {
                 .issuer(this.issuer)
                 .issueTime(now)
                 .expirationTime(expiration)
-                .claim("typ", Token.REFRESH.name())
+                .claim("typ", TokenType.REFRESH.name())
                 .build();
 
         SignedJWT jwt = new SignedJWT(jwsHeader, claimsSet);
@@ -83,6 +77,25 @@ public class JwtServiceImpl implements JwtService {
         } catch (JOSEException e) {
             throw new CustomException(ErrorCode.GENERATE_JWT_ERROR);
         }
+
+    }
+
+    @Override
+    public SignedJWT verifyRefreshToken(String refreshToken) throws ParseException, JOSEException {
+        SignedJWT signedJWT =  SignedJWT.parse(refreshToken);
+        boolean verify = signedJWT.verify(new MACVerifier(secretKey));
+        if(!verify){
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        TokenType tokenType = TokenType.valueOf(signedJWT.getJWTClaimsSet().getClaimAsString("typ"));
+        if(TokenType.REFRESH != tokenType){
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        if(expirationTime.before(new Date())){
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        }
+        return signedJWT;
 
     }
 }

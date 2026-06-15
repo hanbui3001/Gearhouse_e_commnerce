@@ -1,6 +1,7 @@
 package com.example.demo_ecommerce.service.impl;
 
 import com.example.demo_ecommerce.dto.request.UserRegisterRequest;
+import com.example.demo_ecommerce.dto.request.UserUpdateRequest;
 import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
 import com.example.demo_ecommerce.enums.RoleName;
@@ -88,5 +89,18 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserDetailResponse(user);
     }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN') || #id == authentication.name")
+    public UserDetailResponse updateUserById(String id, UserUpdateRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        userMapper.updateUser(request,user);
+        userRepository.save(user);
+        return userMapper.toUserDetailResponse(user);
+    }
+
+
 
 }

@@ -1,6 +1,6 @@
 package com.example.demo_ecommerce.configuration;
 
-import com.example.demo_ecommerce.enums.Token;
+import com.example.demo_ecommerce.enums.TokenType;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
@@ -11,8 +11,8 @@ public class CustomOauth2TokenValidator implements OAuth2TokenValidator<Jwt> {
 
     @Override
     public OAuth2TokenValidatorResult validate(Jwt jwt) {
-        Token token = Token.valueOf(jwt.getClaimAsString("typ"));
-        if(token == Token.ACCESS){
+        TokenType tokenType = TokenType.valueOf(jwt.getClaimAsString("typ"));
+        if(tokenType == TokenType.ACCESS){
             return OAuth2TokenValidatorResult.success();
         }
         return OAuth2TokenValidatorResult.failure(error);

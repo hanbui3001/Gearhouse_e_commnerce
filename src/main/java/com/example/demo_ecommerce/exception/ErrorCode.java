@@ -16,6 +16,8 @@ public enum ErrorCode {
     INVALID_JWT_TOKEN(502, "Only Access Token Is Allow", HttpStatus.UNAUTHORIZED),
     ROLE_INVALID(400,  "Invalid Role", HttpStatus.BAD_REQUEST),
     FORBIDDEN(403,  "Forbidden", HttpStatus.FORBIDDEN),
+    TOKEN_EXPIRED(401,  "Token Expired", HttpStatus.UNAUTHORIZED),
+    COOKIE_REQUIRED(401,  "Cookie Required", HttpStatus.UNAUTHORIZED),
     ;
     private int code;
     private String message;
