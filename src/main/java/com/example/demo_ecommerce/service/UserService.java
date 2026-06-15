@@ -1,6 +1,7 @@
 package com.example.demo_ecommerce.service;
 
 import com.example.demo_ecommerce.dto.request.UserRegisterRequest;
+import com.example.demo_ecommerce.dto.request.UserUpdateRequest;
 import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,4 +12,6 @@ public interface UserService {
     PageResponse<UserDetailResponse> getUsers(int page, int size, String email, String fullName, String phoneNumber);
     UserDetailResponse getMyProfile(@AuthenticationPrincipal Jwt jwt);
     UserDetailResponse getUserById(String id);
+    UserDetailResponse updateUserById(String id,  UserUpdateRequest request);
+
 }

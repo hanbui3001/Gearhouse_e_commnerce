@@ -11,6 +11,7 @@ spring:
     properties:
       hibernate:
         show_sql: true
+        format_sql: true
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   issuer: http://localhost:8080
