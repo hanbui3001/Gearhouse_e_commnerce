@@ -1,9 +1,12 @@
 package com.example.demo_ecommerce.service.impl;
 
+import com.example.demo_ecommerce.dto.request.ChangeStatusRequest;
 import com.example.demo_ecommerce.dto.request.UserRegisterRequest;
+import com.example.demo_ecommerce.dto.request.UserRoleRequest;
 import com.example.demo_ecommerce.dto.request.UserUpdateRequest;
 import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
+import com.example.demo_ecommerce.dto.response.UserRoleResponse;
 import com.example.demo_ecommerce.enums.RoleName;
 import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.exception.CustomException;
@@ -11,14 +14,16 @@ import com.example.demo_ecommerce.exception.ErrorCode;
 import com.example.demo_ecommerce.mapper.UserMapper;
 import com.example.demo_ecommerce.model.Role;
 import com.example.demo_ecommerce.model.User;
+import com.example.demo_ecommerce.model.UserRole;
+import com.example.demo_ecommerce.repository.RoleRepository;
 import com.example.demo_ecommerce.repository.UserRepository;
+import com.example.demo_ecommerce.repository.UserRoleRepository;
 import com.example.demo_ecommerce.repository.specifications.UserSpecification;
 import com.example.demo_ecommerce.service.RoleService;
 import com.example.demo_ecommerce.service.UserService;
 import com.example.demo_ecommerce.utils.PageResponseUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +35,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +46,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Override
     @Transactional
@@ -101,6 +111,65 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDetailResponse(user);
     }
 
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserDetailResponse changeUserStatus(String id, ChangeStatusRequest status) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.setStatus(status.status());
+        userRepository.save(user);
+        return userMapper.toUserDetailResponse(user);
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserRoleResponse assignRoles(String id, UserRoleRequest userRoleRequest) {
+        if(userRoleRequest.roles() == null|| userRoleRequest.roles().isEmpty()){
+            throw new CustomException(ErrorCode.ROLE_REQUIRED);
+        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<String> roleName = userRoleRequest.roles()
+                .stream()
+                .distinct()
+                .toList();
+        List<Role> roles = roleRepository.findAllById(roleName);
+        if(roles.size() != roleName.size()) {
+            throw new CustomException(ErrorCode.ROLE_NOT_FOUND);
+        }
+        List<UserRole> userRoles = userRoleRepository.findByUser(user);
+        Set<String> existRole = userRoles.stream()
+                .map(userRole -> userRole.getRole().getName())
+                .collect(Collectors.toSet());
+        List<String> checkExistRole = roles.stream()
+                .map(Role::getName)
+                .filter(existRole::contains)
+                .toList();
+        if(!checkExistRole.isEmpty()) {
+            throw new CustomException(ErrorCode.ROLE_EXISTED);
+        }
+        List<UserRole>  userRolesToAdd = roles.stream()
+                .map(role -> UserRole.builder()
+                        .user(user)
+                        .role(role)
+                        .build())
+                .toList();
+        if(!userRolesToAdd.isEmpty()) {
+            userRoleRepository.saveAll(userRolesToAdd);
+        }
+        List<String> finalRoles = Stream.concat(userRoles.stream()
+                .map(userRole -> userRole.getRole().getName()),
+                userRolesToAdd.stream()
+                        .map(userRole -> userRole.getRole().getName()))
+                .distinct().toList();
+        return UserRoleResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .roles(finalRoles)
+                .build();
+
+    }
 
 
 }

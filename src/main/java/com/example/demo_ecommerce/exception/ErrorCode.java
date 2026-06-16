@@ -18,6 +18,9 @@ public enum ErrorCode {
     FORBIDDEN(403,  "Forbidden", HttpStatus.FORBIDDEN),
     TOKEN_EXPIRED(401,  "Token Expired", HttpStatus.UNAUTHORIZED),
     COOKIE_REQUIRED(401,  "Cookie Required", HttpStatus.UNAUTHORIZED),
+    ROLE_NOT_FOUND(404,  "Role not found", HttpStatus.NOT_FOUND),
+    ROLE_REQUIRED(404,  "Role Required", HttpStatus.UNAUTHORIZED),
+    ROLE_EXISTED(409,  "Role existed", HttpStatus.CONFLICT),
     ;
     private int code;
     private String message;

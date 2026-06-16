@@ -1,14 +1,17 @@
 package com.example.demo_ecommerce.controller;
 
+import com.example.demo_ecommerce.dto.request.ChangeStatusRequest;
 import com.example.demo_ecommerce.dto.request.UserRegisterRequest;
+import com.example.demo_ecommerce.dto.request.UserRoleRequest;
 import com.example.demo_ecommerce.dto.request.UserUpdateRequest;
 import com.example.demo_ecommerce.dto.response.ApiResponse;
 import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
+import com.example.demo_ecommerce.dto.response.UserRoleResponse;
+import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +69,26 @@ public class UserController {
         return ApiResponse.<UserDetailResponse>builder()
                 .code(200)
                 .message("update user successfully")
+                .data(data)
+                .build();
+    }
+
+    @PutMapping("/status/{id}")
+    public ApiResponse<UserDetailResponse> changeUserStatus(@PathVariable String id, @RequestBody @Valid ChangeStatusRequest status) {
+        var data = userService.changeUserStatus(id, status);
+        return ApiResponse.<UserDetailResponse>builder()
+                .code(200)
+                .message("change user status successfully")
+                .data(data)
+                .build();
+    }
+
+    @PutMapping("/role-assign/{id}")
+    public ApiResponse<UserRoleResponse> assignRoles(@PathVariable String id, @RequestBody UserRoleRequest userRoleRequest) {
+        var data =  userService.assignRoles(id, userRoleRequest);
+        return ApiResponse.<UserRoleResponse>builder()
+                .code(200)
+                .message("assign roles successfully")
                 .data(data)
                 .build();
     }
