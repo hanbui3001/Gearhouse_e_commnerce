@@ -92,4 +92,14 @@ public class UserController {
                 .data(data)
                 .build();
     }
+
+    @DeleteMapping("/role-delete/{id}")
+    public ApiResponse<UserRoleResponse> deleteRoles(@PathVariable String id, @RequestBody UserRoleRequest userRoleRequest) {
+        var data = userService.deleteRoles(id, userRoleRequest);
+        return ApiResponse.<UserRoleResponse>builder()
+                .code(200)
+                .message("delete roles successfully")
+                .data(data)
+                .build();
+    }
 }

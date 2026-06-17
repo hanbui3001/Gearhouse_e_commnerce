@@ -21,6 +21,8 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(404,  "Role not found", HttpStatus.NOT_FOUND),
     ROLE_REQUIRED(404,  "Role Required", HttpStatus.UNAUTHORIZED),
     ROLE_EXISTED(409,  "Role existed", HttpStatus.CONFLICT),
+    CANNOT_SELF_REVOKE_ADMIN(401, "Cannot Self Revoke Admin", HttpStatus.UNAUTHORIZED),
+    ROLE_NOT_ASSIGN_TO_USER(400, "Role not assigned to user", HttpStatus.BAD_REQUEST),
     ;
     private int code;
     private String message;

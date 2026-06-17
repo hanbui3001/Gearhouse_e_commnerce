@@ -30,6 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -86,8 +88,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailResponse getMyProfile(Jwt jwt) {
-        String email = jwt.getSubject();
-        User user = userRepository.findByEmail(email)
+        String id = jwt.getSubject();
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return  userMapper.toUserDetailResponse(user);
     }
@@ -163,6 +165,57 @@ public class UserServiceImpl implements UserService {
                 userRolesToAdd.stream()
                         .map(userRole -> userRole.getRole().getName()))
                 .distinct().toList();
+        return UserRoleResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .roles(finalRoles)
+                .build();
+
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserRoleResponse deleteRoles(String id, UserRoleRequest userRoleRequest) {
+        if(userRoleRequest.roles() == null|| userRoleRequest.roles().isEmpty()){
+            throw new CustomException(ErrorCode.ROLE_REQUIRED);
+        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<String> roleRequest = userRoleRequest.roles()
+                .stream()
+                .distinct()
+                .toList();
+        List<Role> roles = roleRepository.findAllById(roleRequest);
+        if(roles.size() != roleRequest.size()) {
+            throw new CustomException(ErrorCode.ROLE_NOT_FOUND);
+        }
+        List<UserRole> userRoles = userRoleRepository.findByUser(user);
+        boolean isHaveAdminRole = userRoles.stream()
+                .anyMatch(role -> role.getRole().getName().equals(RoleName.ROLE_ADMIN.name()));
+        boolean isRequestHasAdminRole = roleRequest.contains(RoleName.ROLE_ADMIN.name());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isSelfRevokeAdmin = authentication != null
+                && user.getId().equals(authentication.getName())
+                && isHaveAdminRole
+                && isRequestHasAdminRole;
+        if(isSelfRevokeAdmin) {
+            throw new CustomException(ErrorCode.CANNOT_SELF_REVOKE_ADMIN);
+        }
+        Set<String> roleNamesToDelete = roles.stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+        List<UserRole> userRolesToDelete = userRoles.stream()
+                .filter(userRole -> roleNamesToDelete.contains(userRole.getRole().getName()))
+                .toList();
+        if(userRolesToDelete.size() != roleRequest.size()) {
+            throw new CustomException(ErrorCode.ROLE_NOT_ASSIGN_TO_USER);
+        }
+        userRoleRepository.deleteAll(userRolesToDelete);
+        List<String> finalRoles = userRoles.stream()
+                .map(userRole -> userRole.getRole().getName())
+                .filter(roleName -> !roleNamesToDelete.contains(roleName))
+                .toList();
         return UserRoleResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())

@@ -24,4 +24,5 @@ public interface UserService {
 
 
     UserRoleResponse assignRoles(String id, UserRoleRequest userRoleRequest);
+    UserRoleResponse deleteRoles(String id, UserRoleRequest userRoleRequest);
 }
