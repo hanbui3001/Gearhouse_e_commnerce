@@ -114,6 +114,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserDetailResponse changeUserStatus(String id, ChangeStatusRequest status) {
         User user = userRepository.findById(id)
@@ -223,6 +224,5 @@ public class UserServiceImpl implements UserService {
                 .build();
 
     }
-
 
 }

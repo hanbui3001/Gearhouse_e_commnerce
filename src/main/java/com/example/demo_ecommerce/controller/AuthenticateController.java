@@ -4,12 +4,14 @@ import com.example.demo_ecommerce.dto.request.AuthenticateRequest;
 import com.example.demo_ecommerce.dto.response.ApiResponse;
 import com.example.demo_ecommerce.dto.response.AuthenticateResponse;
 import com.example.demo_ecommerce.service.AuthenticationService;
+import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.time.Duration;
 
 @RestController
@@ -19,7 +21,7 @@ public class AuthenticateController {
     private final AuthenticationService authenticationService;
     @PostMapping("/login")
     public ApiResponse<AuthenticateResponse> authenticate(@RequestBody AuthenticateRequest authenticateRequest,
-                                                          HttpServletResponse response) {
+                                                          HttpServletResponse response) throws ParseException {
         var authenticate = authenticationService.authenticate(authenticateRequest);
         var refreshToken = authenticate.getRefreshToken();
         ResponseCookie cookie =ResponseCookie.from("refresh_token", refreshToken)
@@ -44,6 +46,23 @@ public class AuthenticateController {
                 .code(200)
                 .message("refresh token successfully")
                 .data(data)
+                .build();
+    }
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestHeader("Authorization") String authorizationHeader,
+                                    @CookieValue(value = "refresh_token", required = false) String refreshToken,
+                                    HttpServletResponse response) throws ParseException, JOSEException {
+        authenticationService.logout(authorizationHeader, refreshToken);
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(false)
+                .domain("localhost")
+                .path("/v1/auth")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("logout successfully")
                 .build();
     }
 }

@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class JwtServiceImpl implements JwtService {
         Date expiration = Date.from(now.toInstant().plus(30, ChronoUnit.HOURS));
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(userId)
+                .jwtID(UUID.randomUUID().toString())
                 .issuer(this.issuer)
                 .issueTime(now)
                 .expirationTime(expiration)
@@ -64,6 +66,7 @@ public class JwtServiceImpl implements JwtService {
         Date expiration = Date.from(now.toInstant().plus(10, ChronoUnit.DAYS));
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(userId)
+                .jwtID(UUID.randomUUID().toString())
                 .issuer(this.issuer)
                 .issueTime(now)
                 .expirationTime(expiration)
