@@ -1,6 +1,6 @@
 package com.example.demo_ecommerce.enums;
 
-public enum Token {
+public enum TokenType {
     ACCESS,
     REFRESH,
 }

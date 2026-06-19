@@ -27,7 +27,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     private final static String[] ENPOINTS = {
             "/v1/users/**",
-            "/v1/authenticate"
+            "/v1/auth/**"
     };
     @Bean
     SecurityFilterChain SecurityChainFilter(HttpSecurity http) {
