@@ -37,8 +37,6 @@ public class User extends BaseEntity implements UserDetails {
     private LocalDate dateOfBirth;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Cart cart;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @Builder.Default
     Set<UserRole> userRoles = new HashSet<>();
