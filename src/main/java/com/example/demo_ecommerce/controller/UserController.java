@@ -8,7 +8,6 @@ import com.example.demo_ecommerce.dto.response.ApiResponse;
 import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
 import com.example.demo_ecommerce.dto.response.UserRoleResponse;
-import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

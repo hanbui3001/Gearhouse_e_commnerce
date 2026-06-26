@@ -23,6 +23,7 @@ public class CustomOauth2TokenValidator implements OAuth2TokenValidator<Jwt> {
             return OAuth2TokenValidatorResult.failure(error);
         }
         String jwtId = jwt.getId();
+        @SuppressWarnings("null")
         boolean isRevoked = repository.findById(jwtId)
                 .map(Token::isRevoked)
                 .orElse(false);
