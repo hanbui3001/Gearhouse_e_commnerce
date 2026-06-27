@@ -1,5 +1,6 @@
 package com.example.demo_ecommerce.dto.request;
 
+import com.example.demo_ecommerce.validation.annotation.PasswordMatch;
 import com.example.demo_ecommerce.validation.annotation.ValidEmail;
 import com.example.demo_ecommerce.validation.annotation.ValidPhoneNumber;
 import jakarta.validation.constraints.Email;
@@ -11,7 +12,7 @@ import lombok.Builder;
 import java.time.LocalDate;
 
 @Builder
-
+@PasswordMatch
 public record UserRegisterRequest(
         @NotBlank(message = "email is required")
         @Email
@@ -20,6 +21,7 @@ public record UserRegisterRequest(
         @Size(min = 6, message = "password is greater than 6 characters")
         String password,
         @NotBlank
+        String confirmPassword,
         @NotBlank(message = "full name is required")
         String fullName,
         @NotBlank(message = "phone number is required")
