@@ -5,7 +5,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,12 +30,14 @@ public class GlobalHandlerException {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e, WebRequest webRequest) {
         BindingResult bindingResult = e.getBindingResult();
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        List<String> errrors = fieldErrors.stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList();
-        String messsage = String.join(",", errrors);
+        List<String> errors = bindingResult.getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList();
+        String message = String.join(",", errors);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(messsage)
+                .message(message)
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .timestamp( LocalTime.now())
                 .path(webRequest.getDescription(false).replace("uri=", ""))
@@ -56,4 +57,6 @@ public class GlobalHandlerException {
                 .build();
         return ResponseEntity.status(errorCode.getHttpStatus()).body(errorResponse);
     }
+
+
 }
