@@ -13,6 +13,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "User not found", HttpStatus.NOT_FOUND),
     UNAUTHORIZED(401, "Unauthorized", HttpStatus.UNAUTHORIZED),
     GENERATE_JWT_ERROR(500, "Generate JWT Error", HttpStatus.INTERNAL_SERVER_ERROR),
+    EMAIL_SEND_FAILED(500, "Email Send Failed", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_JWT_TOKEN(502, "Only Access Token Is Allow", HttpStatus.UNAUTHORIZED),
     ROLE_INVALID(400,  "Invalid Role", HttpStatus.BAD_REQUEST),
     FORBIDDEN(403,  "Forbidden", HttpStatus.FORBIDDEN),

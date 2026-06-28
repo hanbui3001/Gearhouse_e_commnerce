@@ -1,0 +1,272 @@
+<!DOCTYPE html><html class="light" lang="vi" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Đăng ký | TECH_SPEC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#80561a",
+                    "secondary-fixed": "#ffddb7",
+                    "background": "#fdf8f7",
+                    "on-secondary-fixed": "#2a1700",
+                    "surface-bright": "#fdf8f7",
+                    "surface-container": "#f1edeb",
+                    "inverse-primary": "#cdc5be",
+                    "tertiary": "#000000",
+                    "primary-fixed": "#e9e1da",
+                    "on-tertiary-container": "#858387",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#643f01",
+                    "surface": "#fdf8f7",
+                    "on-surface-variant": "#4b463f",
+                    "warm-border": "#E4DDD0",
+                    "on-primary-fixed-variant": "#4a4641",
+                    "paper-surface": "#FBF8F1",
+                    "on-background": "#1c1b1b",
+                    "surface-container-low": "#f7f3f1",
+                    "surface-container-highest": "#e6e1e0",
+                    "brass-surface": "#EFE1C7",
+                    "tertiary-fixed-dim": "#c8c5ca",
+                    "on-surface": "#1c1b1b",
+                    "on-primary-container": "#89837d",
+                    "primary-container": "#1e1b17",
+                    "inverse-surface": "#31302f",
+                    "weathered-taupe": "#8A7D6C",
+                    "primary-fixed-dim": "#cdc5be",
+                    "canvas-base": "#F7F2E9",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#cec5bc",
+                    "milk-surface": "#FFFDF8",
+                    "tertiary-container": "#1b1b1e",
+                    "surface-variant": "#e6e1e0",
+                    "deep-cocoa": "#2F2217",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#47464a",
+                    "on-primary-fixed": "#1e1b17",
+                    "secondary-container": "#fec47e",
+                    "muted-clay": "#6E6255",
+                    "on-secondary-container": "#784f13",
+                    "tertiary-fixed": "#e4e1e6",
+                    "on-error": "#ffffff",
+                    "primary": "#000000",
+                    "surface-tint": "#635e58",
+                    "on-tertiary-fixed": "#1b1b1e",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#f4bc76",
+                    "surface-container-high": "#ece7e6",
+                    "inverse-on-surface": "#f4f0ee",
+                    "surface-dim": "#ddd9d8",
+                    "outline": "#7d766e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "1.5rem",
+                    "margin-desktop": "4rem",
+                    "gutter": "1.5rem",
+                    "xl": "3rem",
+                    "xs": "0.5rem",
+                    "margin-mobile": "1rem",
+                    "sm": "1rem",
+                    "lg": "2rem"
+            },
+            "fontFamily": {
+                    "price-display": ["JetBrains Mono"],
+                    "headline-lg": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "display-md": ["Geist"],
+                    "body-md": ["Geist"],
+                    "body-lg": ["Geist"],
+                    "label-mono": ["JetBrains Mono"],
+                    "headline-sm": ["Geist"]
+            },
+            "fontSize": {
+                    "price-display": ["20px", {"lineHeight": "1.1", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-lg": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "600"}],
+                    "display-md": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.75", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "label-mono": ["13px", {"lineHeight": "1.5", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .double-bezel {
+        box-shadow: 0 0 0 1px theme('colors.warm-border'), 0 0 0 4px theme('colors.paper-surface');
+      }
+      .form-input-focus:focus {
+        border-color: theme('colors.secondary');
+        box-shadow: 0 4px 0 0 theme('colors.secondary') inset;
+        outline: none;
+      }
+      body {
+        background-color: theme('colors.canvas-base');
+      }
+    </style>
+</head>
+<body class="font-body-md text-body-md text-on-surface antialiased overflow-x-hidden"><nav class="fixed top-0 left-0 w-full h-20 backdrop-blur-sm z-50 border-b border-warm-border/20">
+  <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+    <div class="flex items-center gap-6">
+      <a href="#" class="flex items-center gap-1 text-on-surface hover:opacity-70 transition-opacity font-body-md">
+        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+        <span class="">Quay lại</span>
+      </a>
+      <div class="flex items-center">
+        <span class="font-display-md text-headline-sm font-bold tracking-tighter text-primary">TECH_SPEC</span>
+      </div>
+    </div>
+  </div>
+</nav>
+<!-- TopNavBar -->
+
+<main class="min-h-screen pb-24 flex flex-col items-center justify-center pt-32">
+<!-- Decoration Elements -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden opacity-20">
+<div class="absolute top-[10%] left-[5%] w-96 h-96 bg-secondary-fixed rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[10%] right-[5%] w-64 h-64 bg-brass-surface rounded-full blur-[100px]"></div>
+</div>
+<!-- Registration Container -->
+<div class="w-full max-w-2xl px-margin-mobile md:px-0">
+<div class="rounded-[2rem] p-8 md:p-16 border-warm-border">
+<div class="text-center mb-12">
+<span class="font-label-mono text-label-mono uppercase tracking-widest text-secondary mb-4 block">Gia nhập cộng đồng</span>
+<h1 class="font-display-md text-display-md text-primary mb-4 leading-tight">Tạo tài khoản mới.</h1>
+<p class="text-muted-clay font-body-lg text-body-lg max-w-md mx-auto">
+                        Trải nghiệm không gian công nghệ được tuyển chọn kỹ lưỡng và các ưu đãi đặc quyền từ TECH_SPEC.
+                    </p>
+</div>
+<!-- Form -->
+<form class="space-y-6" id="registrationForm">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Full Name -->
+<div class="space-y-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant px-1" for="fullName">HỌ VÀ TÊN</label>
+<input class="w-full h-14 px-6 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md focus:ring-0 focus:border-secondary transition-all outline-none" id="fullName" name="fullName" placeholder="Nguyễn Văn A" required="" type="text">
+</div>
+<!-- Email -->
+<div class="space-y-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant px-1" for="email">EMAIL</label>
+<input class="w-full h-14 px-6 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md focus:ring-0 focus:border-secondary transition-all outline-none" id="email" name="email" placeholder="example@techspec.vn" required="" type="email">
+</div>
+<!-- Phone -->
+<div class="space-y-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant px-1" for="phone">SỐ ĐIỆN THOẠI</label>
+<input class="w-full h-14 px-6 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md focus:ring-0 focus:border-secondary transition-all outline-none" id="phone" name="phone" placeholder="09xx xxx xxx" required="" type="tel">
+</div>
+<!-- Date of Birth -->
+<div class="space-y-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant px-1" for="dob">NGÀY SINH</label>
+<input class="w-full h-14 px-6 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md focus:ring-0 focus:border-secondary transition-all outline-none" id="dob" name="dob" required="" type="date">
+</div>
+<!-- Password -->
+<div class="space-y-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant px-1" for="password">MẬT KHẨU</label>
+<input class="w-full h-14 px-6 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md focus:ring-0 focus:border-secondary transition-all outline-none" id="password" name="password" placeholder="••••••••" required="" type="password">
+</div>
+<!-- Confirm Password -->
+<div class="space-y-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant px-1" for="confirmPassword">NHẬP LẠI MẬT KHẨU</label>
+<input class="w-full h-14 px-6 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md focus:ring-0 focus:border-secondary transition-all outline-none" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required="" type="password">
+</div>
+</div>
+<!-- Terms & Conditions -->
+<div class="flex items-start gap-3 pt-4">
+<div class="relative flex items-center h-6">
+<input class="w-5 h-5 rounded border-warm-border text-secondary focus:ring-secondary/20 transition-all cursor-pointer" id="terms" name="terms" required="" type="checkbox">
+</div>
+<label class="text-on-surface-variant text-body-md cursor-pointer select-none" for="terms">
+                            Tôi đồng ý với các <a class="text-secondary font-medium underline underline-offset-4 decoration-secondary/30 hover:decoration-secondary" href="#">điều khoản và điều kiện</a> của TECH_SPEC.
+                        </label>
+</div>
+<!-- Actions -->
+<div class="pt-8 space-y-6">
+<button class="w-full h-14 bg-primary text-on-primary rounded-xl font-headline-sm text-headline-sm hover:bg-deep-cocoa active:scale-[0.98] transition-all duration-300 shadow-md" type="submit">
+                            Đăng ký ngay
+                        </button>
+<div class="relative flex items-center py-4">
+<div class="flex-grow border-t border-warm-border"></div>
+<span class="flex-shrink mx-4 font-label-mono text-label-mono text-muted-clay uppercase">Hoặc đăng ký bằng</span>
+<div class="flex-grow border-t border-warm-border"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-3 w-full h-14 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md hover:bg-warm-border/20 transition-colors active:scale-[0.98]" type="button">
+<svg class="w-5 h-5" viewBox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="">Tiếp tục với Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 w-full h-14 bg-milk-surface border border-warm-border rounded-xl font-body-md text-body-md hover:bg-warm-border/20 transition-colors active:scale-[0.98]" type="button">
+<svg class="w-5 h-5 fill-primary" viewBox="0 0 24 24">
+<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+</svg>
+<span class="">Tiếp tục với GitHub</span>
+</button>
+</div>
+</div>
+<p class="text-center text-muted-clay mt-12 font-body-md text-body-md">
+                        Đã có tài khoản? <a class="text-secondary font-medium hover:underline underline-offset-4" href="#">Đăng nhập</a>
+</p>
+</form>
+</div>
+</div>
+<!-- Featured Products Teaser (Optional Editorial touch) -->
+</main>
+<!-- Footer -->
+<script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Basic animation feedback
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'Đang xử lý...';
+            btn.disabled = true;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            setTimeout(() => {
+                alert('Yêu cầu đăng ký đã được gửi! Cảm ơn bạn đã gia nhập TECH_SPEC.');
+                btn.innerText = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+            }, 1500);
+        });
+
+        // Hover effect for input containers
+        const inputs = document.querySelectorAll('input:not([type="checkbox"])');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('scale-[1.01]');
+                input.parentElement.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+    </script>
+
+
+</body></html>

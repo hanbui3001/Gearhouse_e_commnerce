@@ -1,6 +1,7 @@
 package com.example.demo_ecommerce.service;
 
 import com.example.demo_ecommerce.dto.request.AuthenticateRequest;
+import com.example.demo_ecommerce.dto.request.ResetPasswordRequest;
 import com.example.demo_ecommerce.dto.response.AuthenticateResponse;
 import com.nimbusds.jose.JOSEException;
 
@@ -10,5 +11,6 @@ public interface AuthenticationService {
     AuthenticateResponse authenticate(AuthenticateRequest request) throws ParseException;
     AuthenticateResponse refreshToken(String refreshToken);
     void logout(String acessToken, String refreshToken ) throws ParseException, JOSEException;
-
+    void forgetPassword(String email);
+    void resetPassword(ResetPasswordRequest request) throws ParseException, JOSEException;
 }
