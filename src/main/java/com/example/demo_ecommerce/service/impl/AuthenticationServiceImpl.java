@@ -1,6 +1,8 @@
 package com.example.demo_ecommerce.service.impl;
 
+import com.example.demo_ecommerce.dto.internal.JwtDetails;
 import com.example.demo_ecommerce.dto.request.AuthenticateRequest;
+import com.example.demo_ecommerce.dto.request.ResetPasswordRequest;
 import com.example.demo_ecommerce.dto.response.AuthenticateResponse;
 import com.example.demo_ecommerce.enums.TokenType;
 import com.example.demo_ecommerce.exception.CustomException;
@@ -10,18 +12,21 @@ import com.example.demo_ecommerce.model.User;
 import com.example.demo_ecommerce.repository.TokenRepository;
 import com.example.demo_ecommerce.repository.UserRepository;
 import com.example.demo_ecommerce.service.AuthenticationService;
+import com.example.demo_ecommerce.service.EmailService;
 import com.example.demo_ecommerce.service.JwtService;
 import com.example.demo_ecommerce.utils.SecurityUtil;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +38,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public AuthenticateResponse authenticate(AuthenticateRequest request) throws ParseException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
@@ -40,22 +48,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         User user = (User) authentication.getPrincipal();
         List<String> authorities = SecurityUtil.getAuthorities(user);
-        String accessToken = jwtService.generateAccessToken(user.getId(), authorities);
-        String refreshToken = jwtService.generateRefreshToken(user.getId());
+        JwtDetails accessToken = jwtService.generateAccessToken(user.getId(), authorities);
+        JwtDetails refreshToken = jwtService.generateRefreshToken(user.getId());
 
-        SignedJWT signedRefreshToken = SignedJWT.parse(refreshToken);
-        TokenType tokenType = TokenType.valueOf(signedRefreshToken.getJWTClaimsSet().getStringClaim("typ"));
         tokenRepository.save(Token.builder()
-                        .jwtId(signedRefreshToken.getJWTClaimsSet().getJWTID())
-                        .expiredTime(signedRefreshToken.getJWTClaimsSet().getExpirationTime())
-                        .tokenType(tokenType)
+                        .jwtId(refreshToken.getJwtId())
+                        .tokenType(TokenType.REFRESH)
+                        .timeToLive(refreshToken.getSecondsTtl())
                         .revoked(false)
-                        .userId(signedRefreshToken.getJWTClaimsSet().getSubject())
+                        .userId(user.getId())
                 .build());
 
         return AuthenticateResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(accessToken.getValue())
+                .refreshToken(refreshToken.getValue())
                 .build();
     }
 
@@ -65,7 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new CustomException(ErrorCode.COOKIE_REQUIRED);
         }
         try {
-            SignedJWT signedJWT = jwtService.verifyRefreshToken(refreshToken);
+            SignedJWT signedJWT = jwtService.verifyToken(refreshToken, TokenType.REFRESH);
             String userId = signedJWT.getJWTClaimsSet().getSubject();
             User user = userRepository.findByIdWithRoles(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -76,9 +82,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 throw new CustomException(ErrorCode.UNAUTHORIZED);
             }
             List<String> authorities = SecurityUtil.getAuthorities(user);
-            String accessToken = jwtService.generateAccessToken(user.getId(), authorities);
+            JwtDetails accessToken = jwtService.generateAccessToken(user.getId(), authorities);
             return AuthenticateResponse.builder()
-                    .accessToken(accessToken)
+                    .accessToken(accessToken.getValue())
                     .build();
         } catch (ParseException | JOSEException e) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -96,19 +102,63 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         tokenRepository.save(Token.builder()
                         .jwtId(signedAccessToken.getJWTClaimsSet().getJWTID())
                         .tokenType(tokenType)
-                        .expiredTime(signedAccessToken.getJWTClaimsSet().getExpirationTime())
                         .revoked(true)
+                        .timeToLive(secondsUntil(signedAccessToken.getJWTClaimsSet().getExpirationTime()))
                         .userId(signedAccessToken.getJWTClaimsSet().getSubject())
                 .build());
 
         if(StringUtils.hasText(refreshToken)){
-            SignedJWT signedRefreshToken = jwtService.verifyRefreshToken(refreshToken);
+            SignedJWT signedRefreshToken = jwtService.verifyToken(refreshToken, TokenType.REFRESH);
             String jwtId = signedRefreshToken.getJWTClaimsSet().getJWTID();
             Token refresh = tokenRepository.findById(jwtId)
                     .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
             refresh.setRevoked(true);
             tokenRepository.save(refresh);
         }
+    }
+
+    @Override
+    public void forgetPassword(String email) {
+        var userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()) {
+            return;
+        }
+        User user = userOptional.get();
+        JwtDetails passwordToken = jwtService.generatePasswordToken(user.getId());
+
+        redisTemplate.opsForValue().set(
+                "reset-password:" + passwordToken.getJwtId(),
+                user.getId(),
+                Duration.ofSeconds(passwordToken.getSecondsTtl())
+        );
+        emailService.sendPasswordResetEmail(user.getEmail(), passwordToken.getValue());
+
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest request)  {
+        try {
+            SignedJWT signedPassword = jwtService.verifyToken(request.token(), TokenType.RESET_PASSWORD);
+            String resetPasswordKey = "reset-password:" + signedPassword.getJWTClaimsSet().getJWTID();
+            String userId = signedPassword.getJWTClaimsSet().getSubject();
+            String storedUserId = redisTemplate.opsForValue().get(resetPasswordKey);
+
+            if (!userId.equals(storedUserId)) {
+                throw new CustomException(ErrorCode.UNAUTHORIZED);
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            user.setPassword(passwordEncoder.encode(request.newPassword()));
+            userRepository.save(user);
+            redisTemplate.delete(resetPasswordKey);
+        }catch (ParseException | JOSEException e) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+    }
+
+    private long secondsUntil(Date expirationTime) {
+        return Math.max((expirationTime.getTime() - System.currentTimeMillis()) / 1000, 1);
     }
 
 }
