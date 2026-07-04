@@ -36,3 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 .env
+
+### Codex / agent local files ###
+.agents/
+AGENTS.md
+DESIGN.md
+skills-lock.json
