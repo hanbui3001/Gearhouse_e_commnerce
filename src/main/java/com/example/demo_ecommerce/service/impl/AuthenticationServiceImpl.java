@@ -1,9 +1,11 @@
 package com.example.demo_ecommerce.service.impl;
 
+import com.example.demo_ecommerce.constant.EmailSubjectConstant;
 import com.example.demo_ecommerce.dto.internal.JwtDetails;
 import com.example.demo_ecommerce.dto.request.AuthenticateRequest;
 import com.example.demo_ecommerce.dto.request.ResetPasswordRequest;
 import com.example.demo_ecommerce.dto.response.AuthenticateResponse;
+import com.example.demo_ecommerce.enums.EmailTemplates;
 import com.example.demo_ecommerce.enums.TokenType;
 import com.example.demo_ecommerce.exception.CustomException;
 import com.example.demo_ecommerce.exception.ErrorCode;
@@ -18,6 +20,7 @@ import com.example.demo_ecommerce.utils.SecurityUtil;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,8 +30,10 @@ import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +46,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RedisTemplate<String, String> redisTemplate;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${client.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
     @Override
     public AuthenticateResponse authenticate(AuthenticateRequest request) throws ParseException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
@@ -125,13 +133,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         User user = userOptional.get();
         JwtDetails passwordToken = jwtService.generatePasswordToken(user.getId());
-
+        String resetUrl = frontendUrl + "/reset-password?token=" + passwordToken.getValue();
         redisTemplate.opsForValue().set(
                 "reset-password:" + passwordToken.getJwtId(),
                 user.getId(),
                 Duration.ofSeconds(passwordToken.getSecondsTtl())
         );
-        emailService.sendPasswordResetEmail(user.getEmail(), passwordToken.getValue());
+        long expireMinutes = TimeUnit.SECONDS.toMinutes(passwordToken.getSecondsTtl());
+        emailService.sendEmailBySendGrid(user.getEmail(), EmailTemplates.RESET_PASSWORD.getKey(), Map.of(
+                "name", user.getFullName(),
+                "resetLink", resetUrl,
+                "expireMinutes", expireMinutes,
+                "subject", EmailSubjectConstant.RESET_PASSWORD_SUBJECT
+        ));
 
     }
 

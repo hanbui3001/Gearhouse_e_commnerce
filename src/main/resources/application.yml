@@ -14,6 +14,7 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -40,3 +41,14 @@ web:
 
 client:
   frontend-url: http://localhost:3000
+
+sendgrid:
+  api-key: ${SENDGRID_API_KEY}
+  from-email: ${SENDGRID_FROM_MAIL}
+  from-name: ${SENDGRID_FROM_NAME:Gearhouse}
+  template-id:
+    welcome: d-5eb0c80c3651446fa71f97a8158eba86
+    reset-password: d-68a654d772ec47e6ae9dacefc28375e0
+
+
+

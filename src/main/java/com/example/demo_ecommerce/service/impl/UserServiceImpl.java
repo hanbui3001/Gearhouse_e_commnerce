@@ -1,5 +1,6 @@
 package com.example.demo_ecommerce.service.impl;
 
+import com.example.demo_ecommerce.constant.EmailSubjectConstant;
 import com.example.demo_ecommerce.dto.request.ChangeStatusRequest;
 import com.example.demo_ecommerce.dto.request.UserRegisterRequest;
 import com.example.demo_ecommerce.dto.request.UserRoleRequest;
@@ -7,6 +8,7 @@ import com.example.demo_ecommerce.dto.request.UserUpdateRequest;
 import com.example.demo_ecommerce.dto.response.PageResponse;
 import com.example.demo_ecommerce.dto.response.UserDetailResponse;
 import com.example.demo_ecommerce.dto.response.UserRoleResponse;
+import com.example.demo_ecommerce.enums.EmailTemplates;
 import com.example.demo_ecommerce.enums.RoleName;
 import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.exception.CustomException;
@@ -19,6 +21,7 @@ import com.example.demo_ecommerce.repository.RoleRepository;
 import com.example.demo_ecommerce.repository.UserRepository;
 import com.example.demo_ecommerce.repository.UserRoleRepository;
 import com.example.demo_ecommerce.repository.specifications.UserSpecification;
+import com.example.demo_ecommerce.service.EmailService;
 import com.example.demo_ecommerce.service.RoleService;
 import com.example.demo_ecommerce.service.UserService;
 import com.example.demo_ecommerce.utils.PageResponseUtils;
@@ -37,6 +40,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,6 +54,7 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -60,6 +65,9 @@ public class UserServiceImpl implements UserService {
         user.setStatus(Status.ACTIVE);
         user.addRole(roleByNameOrCreate);
         userRepository.save(user);
+        emailService.sendEmailBySendGrid(user.getEmail(), EmailTemplates.WELCOME.getKey(), Map.of(
+                "name", user.getFullName(),
+                "subject", EmailSubjectConstant.WELCOME_SUBJECT));
         return userMapper.toUserDetailResponse(user);
 
     }
