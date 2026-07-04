@@ -1,11 +1,14 @@
 package com.example.demo_ecommerce.controller;
 
 import com.example.demo_ecommerce.dto.request.AuthenticateRequest;
+import com.example.demo_ecommerce.dto.request.EmailRequest;
+import com.example.demo_ecommerce.dto.request.ResetPasswordRequest;
 import com.example.demo_ecommerce.dto.response.ApiResponse;
 import com.example.demo_ecommerce.dto.response.AuthenticateResponse;
 import com.example.demo_ecommerce.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -63,6 +66,23 @@ public class AuthenticateController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("logout successfully")
+                .build();
+    }
+    @PostMapping("/forget-password")
+    public ApiResponse<Void> forgetPassword(@RequestBody @Valid EmailRequest request){
+        authenticationService.forgetPassword(request.email());
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("a reset password link has been sent")
+                .build();
+    }
+
+    @PostMapping("/reset-password")
+    public ApiResponse<Void> resetPassword(@RequestBody @Valid ResetPasswordRequest request) throws ParseException, JOSEException {
+        authenticationService.resetPassword(request);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("password reset successfully")
                 .build();
     }
 }
