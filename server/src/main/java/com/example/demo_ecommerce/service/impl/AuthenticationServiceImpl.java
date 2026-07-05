@@ -46,7 +46,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final RedisTemplate<String, String> redisTemplate;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-
     @Value("${client.frontend-url:http://localhost:3000}")
     private String frontendUrl;
     @Override

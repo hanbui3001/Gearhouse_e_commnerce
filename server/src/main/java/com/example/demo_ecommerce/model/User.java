@@ -1,5 +1,6 @@
 package com.example.demo_ecommerce.model;
 
+import com.example.demo_ecommerce.enums.AuthProvider;
 import com.example.demo_ecommerce.enums.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
@@ -36,7 +37,12 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private LocalDate dateOfBirth;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status =  Status.ACTIVE;
+    @Column(name = "provider", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider =  AuthProvider.LOCAL;
+    private String providerId;
+    private String avatarUrl;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @Builder.Default
     Set<UserRole> userRoles = new HashSet<>();
