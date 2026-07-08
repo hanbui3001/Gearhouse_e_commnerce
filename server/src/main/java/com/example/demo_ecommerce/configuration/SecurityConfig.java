@@ -2,6 +2,8 @@ package com.example.demo_ecommerce.configuration;
 
 import com.example.demo_ecommerce.security.JwtAcessDeniedHandler;
 import com.example.demo_ecommerce.security.JwtAuthenticationEntryPoint;
+import com.example.demo_ecommerce.security.Oauth2LoginHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,7 +31,9 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final Oauth2LoginHandler oauth2LoginHandler;
     private final static String[] ENPOINTS = {
             "/v1/users/**",
             "/v1/auth/**"
@@ -40,11 +44,12 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, ENPOINTS).permitAll()
                         .anyRequest().authenticated())
+                .oauth2Login(oAuth2LoginConfigurer -> oAuth2LoginConfigurer.successHandler(oauth2LoginHandler))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(new JwtAcessDeniedHandler()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .build();
     }
     @Bean
