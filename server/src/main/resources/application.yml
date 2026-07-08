@@ -1,8 +1,4 @@
 spring:
-  config:
-    import:
-      - optional:file:.env[.properties]
-      - optional:file:../.env[.properties]
   application:
     name: Demo-E-Commerce
   datasource:
@@ -11,7 +7,7 @@ spring:
     password: ${DATABASE_PASSWORD:123456}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
@@ -31,6 +27,22 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - email
+              - profile
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   issuer: http://localhost:8080
@@ -52,5 +64,10 @@ sendgrid:
     welcome: d-5eb0c80c3651446fa71f97a8158eba86
     reset-password: d-68a654d772ec47e6ae9dacefc28375e0
 
-
-
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

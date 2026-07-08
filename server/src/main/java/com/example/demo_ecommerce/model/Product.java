@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,5 +29,7 @@ public class Product extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "category_id")
     Category category;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<ProductImage> productImages =  new ArrayList<>();
 
 }

@@ -1,0 +1,113 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+
+> Task :bootRun
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.6)
+
+2026-07-07T17:45:12.723+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] c.e.d.DemoECommerceApplication           : Starting DemoECommerceApplication using Java 21.0.11 with PID 7284 (D:\work\Project\springboot_project\Gearhouse_e_commnerce\server\build\classes\java\main started by hanva in D:\work\Project\springboot_project\Gearhouse_e_commnerce\server)
+2026-07-07T17:45:12.727+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] c.e.d.DemoECommerceApplication           : No active profile set, falling back to 1 default profile: "default"
+2026-07-07T17:45:13.973+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-07-07T17:45:13.976+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-07T17:45:14.127+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .RepositoryConfigurationExtensionSupport : Spring Data JPA - Could not safely identify store assignment for repository candidate interface com.example.demo_ecommerce.repository.TokenRepository; If you want this repository to be a JPA repository, consider annotating your entities with one of these annotations: jakarta.persistence.Entity, jakarta.persistence.MappedSuperclass (preferred), or consider extending one of the following types with your repository: org.springframework.data.jpa.repository.JpaRepository
+2026-07-07T17:45:14.164+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 178 ms. Found 3 JPA repository interfaces.
+2026-07-07T17:45:14.212+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2026-07-07T17:45:14.213+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-07-07T17:45:14.231+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.demo_ecommerce.repository.RoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-07-07T17:45:14.231+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.demo_ecommerce.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-07-07T17:45:14.231+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.example.demo_ecommerce.repository.UserRoleRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-07-07T17:45:14.237+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 16 ms. Found 1 Redis repository interface.
+2026-07-07T17:45:15.146+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-07-07T17:45:15.169+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-07-07T17:45:15.169+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-07T17:45:15.281+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2488 ms
+2026-07-07T17:45:15.647+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-07-07T17:45:15.748+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-07-07T17:45:16.442+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-07T17:45:16.513+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-07-07T17:45:16.982+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@af007d6
+2026-07-07T17:45:16.987+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-07-07T17:45:17.174+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/e_commerce_management]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.4.10
+	Default catalog/schema: e_commerce_management/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-07T17:45:18.661+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-07T17:45:18.790+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-07T17:45:19.438+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-07T17:45:20.790+07:00  WARN 7284 --- [Demo-E-Commerce] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-07T17:45:20.920+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name userDetailServiceImpl
+2026-07-07T17:45:22.540+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-07-07T17:45:22.552+07:00  INFO 7284 --- [Demo-E-Commerce] [           main] c.e.d.DemoECommerceApplication           : Started DemoECommerceApplication in 10.492 seconds (process running for 11.127)
+Hibernate: 
+    select
+        r1_0.name,
+        r1_0.created_at,
+        r1_0.created_by,
+        r1_0.description,
+        r1_0.updated_at,
+        r1_0.updated_by 
+    from
+        roles r1_0 
+    where
+        r1_0.name=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.created_by,
+        u1_0.date_of_birth,
+        u1_0.email,
+        u1_0.full_name,
+        u1_0.password,
+        u1_0.phone_number,
+        u1_0.status,
+        u1_0.updated_at,
+        u1_0.updated_by 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        ur1_0.user_id,
+        ur1_0.id,
+        ur1_0.created_at,
+        ur1_0.created_by,
+        ur1_0.role_id,
+        ur1_0.updated_at,
+        ur1_0.updated_by 
+    from
+        users_roles ur1_0 
+    where
+        ur1_0.user_id=?
+Hibernate: 
+    insert 
+    into
+        users_roles
+        (created_at, created_by, role_id, updated_at, updated_by, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+2026-07-07T17:45:47.967+07:00  INFO 7284 --- [Demo-E-Commerce] [nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-07T17:45:47.969+07:00  INFO 7284 --- [Demo-E-Commerce] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-07-07T17:45:47.972+07:00  INFO 7284 --- [Demo-E-Commerce] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-07-07T17:45:49.117+07:00  INFO 7284 --- [Demo-E-Commerce] [nio-8080-exec-5] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1028 ms
+
+> Task :bootRun FAILED
+4 actionable tasks: 1 executed, 3 up-to-date
