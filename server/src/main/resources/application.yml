@@ -64,5 +64,10 @@ sendgrid:
     welcome: d-5eb0c80c3651446fa71f97a8158eba86
     reset-password: d-68a654d772ec47e6ae9dacefc28375e0
 
-
-
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

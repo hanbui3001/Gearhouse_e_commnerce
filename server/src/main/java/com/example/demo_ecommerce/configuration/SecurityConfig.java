@@ -2,8 +2,6 @@ package com.example.demo_ecommerce.configuration;
 
 import com.example.demo_ecommerce.security.JwtAcessDeniedHandler;
 import com.example.demo_ecommerce.security.JwtAuthenticationEntryPoint;
-import com.example.demo_ecommerce.security.Oauth2LoginHandler;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,25 +29,30 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-    private final Oauth2LoginHandler oauth2LoginHandler;
     private final static String[] ENPOINTS = {
             "/v1/users/**",
             "/v1/auth/**"
+    };
+    private final static String[] SWAGGER_ENDPOINTS = {
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs",
+            "/v3/api-docs/**"
     };
     @Bean
     SecurityFilterChain SecurityChainFilter(HttpSecurity http) {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, ENPOINTS).permitAll()
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(HttpMethod.POST, ENPOINTS).permitAll()
+                        .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(oAuth2LoginConfigurer -> oAuth2LoginConfigurer.successHandler(oauth2LoginHandler))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(new JwtAcessDeniedHandler()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
     @Bean
