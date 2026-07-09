@@ -37,9 +37,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private LocalDate dateOfBirth;
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Status status =  Status.ACTIVE;
     @Column(name = "provider", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private AuthProvider authProvider =  AuthProvider.LOCAL;
     private String providerId;
     private String avatarUrl;

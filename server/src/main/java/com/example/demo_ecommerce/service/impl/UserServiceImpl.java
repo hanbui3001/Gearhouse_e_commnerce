@@ -10,7 +10,6 @@ import com.example.demo_ecommerce.dto.response.UserDetailResponse;
 import com.example.demo_ecommerce.dto.response.UserRoleResponse;
 import com.example.demo_ecommerce.enums.EmailTemplates;
 import com.example.demo_ecommerce.enums.RoleName;
-import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.exception.CustomException;
 import com.example.demo_ecommerce.exception.ErrorCode;
 import com.example.demo_ecommerce.mapper.UserMapper;
@@ -62,7 +61,6 @@ public class UserServiceImpl implements UserService {
         Role roleByNameOrCreate = roleService.findRoleByNameOrCreate(RoleName.ROLE_USER);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setStatus(Status.ACTIVE);
         user.addRole(roleByNameOrCreate);
         userRepository.save(user);
         emailService.sendEmailBySendGrid(user.getEmail(), EmailTemplates.WELCOME.getKey(), Map.of(
@@ -82,7 +80,7 @@ public class UserServiceImpl implements UserService {
                 .and(UserSpecification.hasPhoneNumber(phoneNumber));
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("fullName").ascending());
         Page<User> users = userRepository.findAll(userSpecification, pageable);
-        List<UserDetailResponse> userDetailResponses =users.getContent().stream()
+        List<UserDetailResponse> userDetailResponses = users.getContent().stream()
                 .map(userMapper::toUserDetailResponse)
                 .toList();
         return PageResponse.<UserDetailResponse>builder()
@@ -99,7 +97,7 @@ public class UserServiceImpl implements UserService {
         String id = jwt.getSubject();
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        return  userMapper.toUserDetailResponse(user);
+        return userMapper.toUserDetailResponse(user);
     }
 
     @Override
@@ -116,7 +114,7 @@ public class UserServiceImpl implements UserService {
     public UserDetailResponse updateUserById(String id, UserUpdateRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        userMapper.updateUser(request,user);
+        userMapper.updateUser(request, user);
         userRepository.save(user);
         return userMapper.toUserDetailResponse(user);
     }
@@ -136,7 +134,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserRoleResponse assignRoles(String id, UserRoleRequest userRoleRequest) {
-        if(userRoleRequest.roles() == null|| userRoleRequest.roles().isEmpty()){
+        if (userRoleRequest.roles() == null || userRoleRequest.roles().isEmpty()) {
             throw new CustomException(ErrorCode.ROLE_REQUIRED);
         }
         User user = userRepository.findById(id)
@@ -146,7 +144,7 @@ public class UserServiceImpl implements UserService {
                 .distinct()
                 .toList();
         List<Role> roles = roleRepository.findAllById(roleName);
-        if(roles.size() != roleName.size()) {
+        if (roles.size() != roleName.size()) {
             throw new CustomException(ErrorCode.ROLE_NOT_FOUND);
         }
         List<UserRole> userRoles = userRoleRepository.findByUser(user);
@@ -157,22 +155,22 @@ public class UserServiceImpl implements UserService {
                 .map(Role::getName)
                 .filter(existRole::contains)
                 .toList();
-        if(!checkExistRole.isEmpty()) {
+        if (!checkExistRole.isEmpty()) {
             throw new CustomException(ErrorCode.ROLE_EXISTED);
         }
-        List<UserRole>  userRolesToAdd = roles.stream()
+        List<UserRole> userRolesToAdd = roles.stream()
                 .map(role -> UserRole.builder()
                         .user(user)
                         .role(role)
                         .build())
                 .toList();
-        if(!userRolesToAdd.isEmpty()) {
+        if (!userRolesToAdd.isEmpty()) {
             userRoleRepository.saveAll(userRolesToAdd);
         }
         List<String> finalRoles = Stream.concat(userRoles.stream()
-                .map(userRole -> userRole.getRole().getName()),
-                userRolesToAdd.stream()
-                        .map(userRole -> userRole.getRole().getName()))
+                                .map(userRole -> userRole.getRole().getName()),
+                        userRolesToAdd.stream()
+                                .map(userRole -> userRole.getRole().getName()))
                 .distinct().toList();
         return UserRoleResponse.builder()
                 .id(user.getId())
@@ -186,7 +184,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public UserRoleResponse deleteRoles(String id, UserRoleRequest userRoleRequest) {
-        if(userRoleRequest.roles() == null|| userRoleRequest.roles().isEmpty()){
+        if (userRoleRequest.roles() == null || userRoleRequest.roles().isEmpty()) {
             throw new CustomException(ErrorCode.ROLE_REQUIRED);
         }
         User user = userRepository.findById(id)
@@ -196,7 +194,7 @@ public class UserServiceImpl implements UserService {
                 .distinct()
                 .toList();
         List<Role> roles = roleRepository.findAllById(roleRequest);
-        if(roles.size() != roleRequest.size()) {
+        if (roles.size() != roleRequest.size()) {
             throw new CustomException(ErrorCode.ROLE_NOT_FOUND);
         }
         List<UserRole> userRoles = userRoleRepository.findByUser(user);
@@ -208,7 +206,7 @@ public class UserServiceImpl implements UserService {
                 && user.getId().equals(authentication.getName())
                 && isHaveAdminRole
                 && isRequestHasAdminRole;
-        if(isSelfRevokeAdmin) {
+        if (isSelfRevokeAdmin) {
             throw new CustomException(ErrorCode.CANNOT_SELF_REVOKE_ADMIN);
         }
         Set<String> roleNamesToDelete = roles.stream()
@@ -217,7 +215,7 @@ public class UserServiceImpl implements UserService {
         List<UserRole> userRolesToDelete = userRoles.stream()
                 .filter(userRole -> roleNamesToDelete.contains(userRole.getRole().getName()))
                 .toList();
-        if(userRolesToDelete.size() != roleRequest.size()) {
+        if (userRolesToDelete.size() != roleRequest.size()) {
             throw new CustomException(ErrorCode.ROLE_NOT_ASSIGN_TO_USER);
         }
         userRoleRepository.deleteAll(userRolesToDelete);
