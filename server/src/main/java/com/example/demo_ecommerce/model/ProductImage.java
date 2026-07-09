@@ -19,4 +19,7 @@ public class ProductImage {
     String imageUrl;
     @Column(name = "display_order")
     Integer displayOrder;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    Product product;
 }
