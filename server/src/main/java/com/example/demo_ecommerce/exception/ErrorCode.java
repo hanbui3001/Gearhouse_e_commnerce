@@ -28,6 +28,9 @@ public enum ErrorCode {
 
     CATEGORY_EXISTED(409, "Category existed", HttpStatus.CONFLICT),
     CATEGORY_NOT_FOUND(404, "Category not found", HttpStatus.NOT_FOUND),
+
+    FILE_LIMIT_CAPACITY(500, "File Limit Exceeded", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNSUPPORTED_MEDIA_TYPE(500, "Unsupported Media Type", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
     private int code;
     private String message;

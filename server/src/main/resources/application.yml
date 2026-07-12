@@ -71,3 +71,16 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+
+cloudinary:
+  cloud_name: ${CLOUD_NAME}
+  api_key: ${CLOUD_API_KEY}
+  api_secret: ${CLOUD_API_SECRET}
+
+aws:
+  credentials:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+  s3:
+    bucket-name: ${AWS_S3_BUCKET_NAME}
+    region: ${AWS_S3_REGION}
