@@ -2,13 +2,11 @@ package com.example.demo_ecommerce.controller;
 
 import com.example.demo_ecommerce.dto.response.ApiResponse;
 import com.example.demo_ecommerce.dto.response.FileResponse;
+import com.example.demo_ecommerce.dto.response.PresignUrlResponse;
 import com.example.demo_ecommerce.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,6 +35,16 @@ public class FileController {
                 .code(HttpStatus.OK.value())
                 .message("upload file successfully")
                 .data(data)
+                .build();
+    }
+
+    @PutMapping("/presign-url")
+    public ApiResponse<PresignUrlResponse> presignUrl(@RequestParam("fileName") String fileName) {
+        var response = fileService.generatePresignUrl(fileName);
+        return ApiResponse.<PresignUrlResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("generate url successfully")
+                .data(response)
                 .build();
     }
 }

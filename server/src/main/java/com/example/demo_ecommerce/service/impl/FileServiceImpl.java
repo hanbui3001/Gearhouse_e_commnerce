@@ -3,6 +3,7 @@ package com.example.demo_ecommerce.service.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.demo_ecommerce.dto.response.FileResponse;
+import com.example.demo_ecommerce.dto.response.PresignUrlResponse;
 import com.example.demo_ecommerce.exception.CustomException;
 import com.example.demo_ecommerce.exception.ErrorCode;
 import com.example.demo_ecommerce.service.FileService;
@@ -15,8 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -28,6 +33,7 @@ public class FileServiceImpl implements FileService {
     private final Cloudinary cloudinary;
     private final Executor uploadExecutor;
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
     @Value("${aws.s3.region}")
@@ -35,10 +41,12 @@ public class FileServiceImpl implements FileService {
 
     public FileServiceImpl(Cloudinary cloudinary,
                            @Qualifier("uploadExecuter") Executor uploadExecutor,
-                           S3Client s3Client) {
+                           S3Client s3Client,
+                           S3Presigner s3Presigner) {
         this.cloudinary = cloudinary;
         this.uploadExecutor = uploadExecutor;
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
     }
 
     @Override
@@ -101,6 +109,25 @@ public class FileServiceImpl implements FileService {
                 .fileType(files.getContentType())
                 .size(sizeMb)
                 .url(url)
+                .build();
+    }
+
+    @Override
+    public PresignUrlResponse generatePresignUrl(String fileName) {
+        String key = generateKey(fileName);
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(2))
+                .putObjectRequest(objectRequest)
+                .build();
+        PresignedPutObjectRequest request = s3Presigner.presignPutObject(presignRequest);
+        String url = request.url().toExternalForm();
+        return PresignUrlResponse.builder()
+                .url(url)
+                .key(key)
                 .build();
     }
 
