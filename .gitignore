@@ -36,6 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 .env
+.env.prod
 
 ### Codex / agent local files ###
 .agents/

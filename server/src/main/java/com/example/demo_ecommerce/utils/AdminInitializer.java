@@ -4,8 +4,6 @@ import com.example.demo_ecommerce.enums.RoleName;
 import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.model.Role;
 import com.example.demo_ecommerce.model.User;
-import com.example.demo_ecommerce.model.UserRole;
-import com.example.demo_ecommerce.repository.RoleRepository;
 import com.example.demo_ecommerce.repository.UserRepository;
 import com.example.demo_ecommerce.repository.UserRoleRepository;
 import com.example.demo_ecommerce.service.RoleService;
@@ -24,6 +22,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class AdminInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
     private final RoleService roleService;
     private final PasswordEncoder encoder;
     @Value("${web.admin.username}")
@@ -39,7 +38,7 @@ public class AdminInitializer implements ApplicationRunner {
         Role adminRole = roleService.findRoleByNameOrCreate(RoleName.ROLE_ADMIN);
         User admin = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                         User adminUser = User.builder()
+                    User adminUser = User.builder()
                             .email(email)
                             .password(encoder.encode(password))
                             .phoneNumber(phoneNumber)
@@ -47,9 +46,11 @@ public class AdminInitializer implements ApplicationRunner {
                             .dateOfBirth(LocalDate.of(2000, 2, 1))
                             .status(Status.ACTIVE)
                             .build();
-                         return userRepository.save(adminUser);
+                    return userRepository.save(adminUser);
                 });
-        admin.addRole(adminRole);
-        userRepository.save(admin);
+        if (!userRoleRepository.existsByUserAndRole(admin, adminRole)) {
+            admin.addRole(adminRole);
+            userRepository.save(admin);
+        }
     }
 }

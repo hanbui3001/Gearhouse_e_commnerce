@@ -22,5 +22,7 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     Optional<User> findByIdWithRoles(String id);
 
     Optional<User> findByAuthProviderAndProviderId(AuthProvider authProvider, String providerId);
+
     Optional<User> findByAuthProviderAndProviderIdOrEmail(AuthProvider authProvider, String providerId, String email);
+
 }

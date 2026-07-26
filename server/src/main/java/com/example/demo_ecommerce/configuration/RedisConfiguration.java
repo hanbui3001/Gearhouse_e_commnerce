@@ -1,5 +1,6 @@
 package com.example.demo_ecommerce.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -15,9 +16,14 @@ import java.time.Duration;
 
 @Configuration
 public class RedisConfiguration {
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
+
     @Bean
     LettuceConnectionFactory lettuceConnectionFactory() {
-        return new LettuceConnectionFactory("localhost", 6379);
+        return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
     @Bean
