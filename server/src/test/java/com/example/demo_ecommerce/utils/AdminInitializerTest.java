@@ -5,6 +5,7 @@ import com.example.demo_ecommerce.enums.Status;
 import com.example.demo_ecommerce.model.Role;
 import com.example.demo_ecommerce.model.User;
 import com.example.demo_ecommerce.repository.UserRepository;
+import com.example.demo_ecommerce.repository.UserRoleRepository;
 import com.example.demo_ecommerce.service.RoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdminInitializerTest {
@@ -34,12 +33,16 @@ class AdminInitializerTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserRoleRepository userRoleRepository;
+
     private AdminInitializer adminInitializer;
 
     @BeforeEach
     void setUp() {
         adminInitializer = new AdminInitializer(
                 userRepository,
+                userRoleRepository,
                 roleService,
                 passwordEncoder
         );

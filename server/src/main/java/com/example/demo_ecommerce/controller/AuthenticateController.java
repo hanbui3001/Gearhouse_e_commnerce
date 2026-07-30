@@ -22,12 +22,13 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthenticateController {
     private final AuthenticationService authenticationService;
+
     @PostMapping("/login")
     public ApiResponse<AuthenticateResponse> authenticate(@RequestBody AuthenticateRequest authenticateRequest,
                                                           HttpServletResponse response) throws ParseException {
         var authenticate = authenticationService.authenticate(authenticateRequest);
         var refreshToken = authenticate.getRefreshToken();
-        ResponseCookie cookie =ResponseCookie.from("refresh_token", refreshToken)
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
                 .secure(false)
                 .domain("localhost")
@@ -42,6 +43,7 @@ public class AuthenticateController {
                 .data(authenticate)
                 .build();
     }
+
     @PostMapping("/refresh-token")
     public ApiResponse<AuthenticateResponse> refreshToken(@CookieValue("refresh_token") String refreshToken) {
         var data = authenticationService.refreshToken(refreshToken);
@@ -51,6 +53,7 @@ public class AuthenticateController {
                 .data(data)
                 .build();
     }
+
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@RequestHeader("Authorization") String authorizationHeader,
                                     @CookieValue(value = "refresh_token", required = false) String refreshToken,
@@ -68,8 +71,9 @@ public class AuthenticateController {
                 .message("logout successfully")
                 .build();
     }
+
     @PostMapping("/forget-password")
-    public ApiResponse<Void> forgetPassword(@RequestBody @Valid EmailRequest request){
+    public ApiResponse<Void> forgetPassword(@RequestBody @Valid EmailRequest request) {
         authenticationService.forgetPassword(request.email());
         return ApiResponse.<Void>builder()
                 .code(200)
