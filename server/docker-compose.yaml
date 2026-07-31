@@ -9,6 +9,12 @@ services:
       MYSQL_DATABASE: e_commerce_management
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - app-network
 
@@ -19,16 +25,32 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
   backend:
-    image: hanbui3001/gearhouse:1.2
+    image: hanbui3001/gearhouse:${IMAGE_TAG}
     container_name: gearhouse_service
     ports:
       - "8080:8080"
     env_file:
       - ../.env.prod
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - app-network
 volumes:

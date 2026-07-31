@@ -1,0 +1,35 @@
+name: Continuous Deployment
+run-name: ${{github.actor}}
+on:
+  workflow_run:
+    workflows:
+      - Continuous Integration Pipeline
+    types:
+      - completed
+    branches:
+      - main
+      - master
+
+jobs:
+  cd-pipeline:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Deploy To EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{secrets.SSH_HOST}}
+          username: ${{secrets.SSH_USERNAME}}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          port: '22'
+          script: |
+            set -e
+            
+            echo "Start Deploying EC2"
+            cd /home/ubuntu
+            sudo bash -c 'echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" > .env'
+            sudo docker compose pull backend
+            sudo docker compose up -d --force-recreate backend
+            sudo docker image prune -f
+            echo "Deploy EC2 Successfully"
+
