@@ -1,7 +1,8 @@
 package com.example.demo_ecommerce.model;
 
 import com.example.demo_ecommerce.enums.TokenType;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
@@ -17,12 +18,15 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Token{
+public class Token {
     @Id
     String jwtId;
+
     String userId;
+
     @Enumerated(EnumType.STRING)
     TokenType tokenType;
+
     @TimeToLive(unit = TimeUnit.SECONDS)
     long timeToLive;
     boolean revoked;

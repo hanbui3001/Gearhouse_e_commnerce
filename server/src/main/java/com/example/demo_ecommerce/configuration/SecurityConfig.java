@@ -2,6 +2,8 @@ package com.example.demo_ecommerce.configuration;
 
 import com.example.demo_ecommerce.security.JwtAcessDeniedHandler;
 import com.example.demo_ecommerce.security.JwtAuthenticationEntryPoint;
+import com.example.demo_ecommerce.security.Oauth2LoginHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,9 +29,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    private final Oauth2LoginHandler oauth2LoginHandler;
+
     private final static String[] ENPOINTS = {
             "/v1/users/**",
             "/v1/auth/**"
@@ -40,6 +45,12 @@ public class SecurityConfig {
             "/v3/api-docs",
             "/v3/api-docs/**"
     };
+    private final static String[] AUTH_URLS = {
+            "/oauth2/**",
+            "/login/oauth2/**",
+            "/error",
+    };
+
     @Bean
     SecurityFilterChain SecurityChainFilter(HttpSecurity http) {
         return http.csrf(AbstractHttpConfigurer::disable)
@@ -47,18 +58,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.POST, ENPOINTS).permitAll()
                         .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
+                        .requestMatchers(AUTH_URLS).permitAll()
                         .anyRequest().authenticated())
+                .oauth2Login(oauth2 -> oauth2.successHandler(oauth2LoginHandler))
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                         .accessDeniedHandler(new JwtAcessDeniedHandler()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
@@ -66,7 +81,7 @@ public class SecurityConfig {
         grantedAuthoritiesConverter.setAuthorityPrefix("");
         JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
         authenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-        return  authenticationConverter;
+        return authenticationConverter;
     }
 
     @Bean

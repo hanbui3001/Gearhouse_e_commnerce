@@ -115,13 +115,9 @@ public class FileServiceImpl implements FileService {
     @Override
     public PresignUrlResponse generatePresignUrl(String fileName) {
         String key = generateKey(fileName);
-        PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(2))
-                .putObjectRequest(objectRequest)
+                .putObjectRequest(builder -> builder.key(key).bucket(bucketName))
                 .build();
         PresignedPutObjectRequest request = s3Presigner.presignPutObject(presignRequest);
         String url = request.url().toExternalForm();

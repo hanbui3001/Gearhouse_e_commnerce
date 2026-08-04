@@ -9,8 +9,16 @@ import java.text.ParseException;
 
 public interface AuthenticationService {
     AuthenticateResponse authenticate(AuthenticateRequest request) throws ParseException;
+
+    AuthenticateResponse issueToken(String userId);
+
+    AuthenticateResponse exchangeOAuthCode(String code);
+
     AuthenticateResponse refreshToken(String refreshToken);
-    void logout(String acessToken, String refreshToken ) throws ParseException, JOSEException;
+
+    void logout(String acessToken, String refreshToken) throws ParseException, JOSEException;
+
     void forgetPassword(String email);
+
     void resetPassword(ResetPasswordRequest request) throws ParseException, JOSEException;
 }

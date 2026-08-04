@@ -18,7 +18,10 @@ import java.util.Set;
 public class Role extends BaseEntity {
     @Id
     String name;
+
     String description;
+
+    @Builder.Default
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     Set<UserRole> userRoles = new HashSet<>();
 }

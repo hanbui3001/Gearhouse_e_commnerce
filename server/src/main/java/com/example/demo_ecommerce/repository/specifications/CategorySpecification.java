@@ -3,7 +3,10 @@ package com.example.demo_ecommerce.repository.specifications;
 import com.example.demo_ecommerce.model.Category;
 import org.springframework.data.jpa.domain.PredicateSpecification;
 
-public class CategorySpecification {
+public final class CategorySpecification {
+    private CategorySpecification() {
+    }
+
     public static PredicateSpecification<Category> hasName(String name) {
         return (from, criteriaBuilder) -> {
             if (name == null || name.isBlank()) {

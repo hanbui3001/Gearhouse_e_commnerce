@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.addRole(roleByNameOrCreate);
+        
         userRepository.save(user);
         emailService.sendEmailBySendGrid(user.getEmail(), EmailTemplates.WELCOME.getKey(), Map.of(
                 "name", user.getFullName(),

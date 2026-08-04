@@ -2,6 +2,7 @@ package com.example.demo_ecommerce.controller;
 
 import com.example.demo_ecommerce.dto.request.AuthenticateRequest;
 import com.example.demo_ecommerce.dto.request.EmailRequest;
+import com.example.demo_ecommerce.dto.request.Oauth2LoginRequest;
 import com.example.demo_ecommerce.dto.request.ResetPasswordRequest;
 import com.example.demo_ecommerce.dto.response.ApiResponse;
 import com.example.demo_ecommerce.dto.response.AuthenticateResponse;
@@ -40,6 +41,27 @@ public class AuthenticateController {
         return ApiResponse.<AuthenticateResponse>builder()
                 .code(200)
                 .message("user authenticated")
+                .data(authenticate)
+                .build();
+    }
+
+    @PostMapping("/oauth/exchange")
+    public ApiResponse<AuthenticateResponse> exchangeOAuthCode(@RequestBody @Valid Oauth2LoginRequest request,
+                                                                HttpServletResponse response) {
+        var authenticate = authenticationService.exchangeOAuthCode(request.code());
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", authenticate.getRefreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/v1/auth")
+                .maxAge(Duration.ofDays(7))
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        authenticate.setRefreshToken(null);
+
+        return ApiResponse.<AuthenticateResponse>builder()
+                .code(200)
+                .message("OAuth login successfully")
                 .data(authenticate)
                 .build();
     }

@@ -4,23 +4,19 @@ import com.example.demo_ecommerce.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "categories")
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Category extends BaseEntity {
+@Table(name = "brands")
+public class Brand extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -31,20 +27,12 @@ public class Category extends BaseEntity {
     @Column(name = "slug", nullable = false, unique = true)
     String slug;
 
-    @Column(name = "description")
-    String description;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Builder.Default
-    @Column(name = "attribute_schema", columnDefinition = "JSON", nullable = false)
-    Map<String, Object> attributeSchema = new HashMap<>();
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     @Builder.Default
     Status status = Status.ACTIVE;
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
+    @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<Product> products = new ArrayList<>();
 }

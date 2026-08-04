@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestControllerAdvice
@@ -22,11 +23,12 @@ public class GlobalHandlerException {
                 .status(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .error(errorCode.getHttpStatus().getReasonPhrase())
-                .timestamp( LocalTime.now())
+                .timestamp(LocalTime.now(ZoneId.systemDefault()))
                 .path(webRequest.getDescription(false).replace("uri=", ""))
                 .build();
         return ResponseEntity.status(errorCode.getHttpStatus()).body(errorResponse);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e, WebRequest webRequest) {
         BindingResult bindingResult = e.getBindingResult();
@@ -39,12 +41,13 @@ public class GlobalHandlerException {
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message(message)
                 .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .timestamp( LocalTime.now())
+                .timestamp(LocalTime.now())
                 .path(webRequest.getDescription(false).replace("uri=", ""))
                 .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e, WebRequest webRequest) {
         ErrorCode errorCode = ErrorCode.USER_EXISTED;
@@ -52,7 +55,7 @@ public class GlobalHandlerException {
                 .status(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .error(errorCode.getHttpStatus().getReasonPhrase())
-                .timestamp( LocalTime.now())
+                .timestamp(LocalTime.now())
                 .path(webRequest.getDescription(false).replace("uri=", ""))
                 .build();
         return ResponseEntity.status(errorCode.getHttpStatus()).body(errorResponse);

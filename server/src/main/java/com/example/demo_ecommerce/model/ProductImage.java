@@ -11,15 +11,18 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Table(name = "product_images")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductImage {
+public class ProductImage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
     @Column(nullable = false, name = "image_url")
     String imageUrl;
-    @Column(name = "display_order")
-    Integer displayOrder;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+
+    @Column(name = "display_order", nullable = false)
+    Integer displayOrder = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
     Product product;
 }

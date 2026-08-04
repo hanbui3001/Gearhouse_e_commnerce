@@ -1,8 +1,6 @@
 package com.example.demo_ecommerce.model;
 
-import com.example.demo_ecommerce.enums.AuthProvider;
 import com.example.demo_ecommerce.enums.Status;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,31 +23,39 @@ public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
     @Column(unique = true, nullable = false)
     private String email;
-    @Column(nullable = false)
+
+    @Column
     private String password;
+
     @Column(nullable = false)
     private String fullName;
-    @Column(unique = true, nullable = false)
+
+    @Column(unique = true)
     private String phoneNumber;
-    @Column(nullable = false)
+
+    @Column
     private LocalDate dateOfBirth;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private Status status =  Status.ACTIVE;
-    @Column(name = "provider", nullable = false)
-    @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private AuthProvider authProvider =  AuthProvider.LOCAL;
-    private String providerId;
+    private Status status = Status.ACTIVE;
+
     private String avatarUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<SocialAccount> socialAccounts = new HashSet<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @Builder.Default
     Set<UserRole> userRoles = new HashSet<>();
+
     public void addRole(Role role) {
         this.userRoles.add(UserRole.builder()
-                        .user(this)
+                .user(this)
                 .role(role)
                 .build());
     }

@@ -52,7 +52,7 @@ class AdminInitializerTest {
     }
 
     @Test
-    void runCreatesAdminUserAndAssignsAdminRoleWhenMissing() throws Exception {
+    void runCreatesAdminUserAndAssignsAdminRoleWhenMissing() {
         Role adminRole = Role.builder()
                 .name(RoleName.ROLE_ADMIN.name())
                 .description("Admin role")
@@ -78,7 +78,7 @@ class AdminInitializerTest {
     }
 
     @Test
-    void runAssignsAdminRoleToExistingAdmin() throws Exception {
+    void runAssignsAdminRoleToExistingAdmin() {
         Role adminRole = Role.builder()
                 .name(RoleName.ROLE_ADMIN.name())
                 .description("Admin role")

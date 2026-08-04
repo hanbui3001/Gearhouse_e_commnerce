@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
@@ -19,7 +18,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
-        ErrorResponse<Object> errorResponse = ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .error(errorCode.getHttpStatus().getReasonPhrase())

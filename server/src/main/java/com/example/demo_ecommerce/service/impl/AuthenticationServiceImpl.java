@@ -11,6 +11,7 @@ import com.example.demo_ecommerce.exception.CustomException;
 import com.example.demo_ecommerce.exception.ErrorCode;
 import com.example.demo_ecommerce.model.Token;
 import com.example.demo_ecommerce.model.User;
+import com.example.demo_ecommerce.repository.RoleRepository;
 import com.example.demo_ecommerce.repository.TokenRepository;
 import com.example.demo_ecommerce.repository.UserRepository;
 import com.example.demo_ecommerce.service.AuthenticationService;
@@ -20,6 +21,7 @@ import com.example.demo_ecommerce.utils.SecurityUtil;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,51 +32,78 @@ import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final RoleRepository roleRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     @Value("${client.frontend-url:http://localhost:3000}")
     private String frontendUrl;
+
     @Override
-    public AuthenticateResponse authenticate(AuthenticateRequest request) throws ParseException {
+    public AuthenticateResponse authenticate(AuthenticateRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         var authentication = authenticationManager.authenticate(authenticationToken);
 
         User user = (User) authentication.getPrincipal();
+        assert user != null;
+        log.info("User {} has been authenticated", user.getUsername());
+        return issueToken(user.getId());
+    }
+
+    @Override
+    public AuthenticateResponse issueToken(String userId) {
+        User user = userRepository.findByIdWithRoles(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<String> authorities = SecurityUtil.getAuthorities(user);
         JwtDetails accessToken = jwtService.generateAccessToken(user.getId(), authorities);
         JwtDetails refreshToken = jwtService.generateRefreshToken(user.getId());
 
         tokenRepository.save(Token.builder()
-                        .jwtId(refreshToken.getJwtId())
-                        .tokenType(TokenType.REFRESH)
-                        .timeToLive(refreshToken.getSecondsTtl())
-                        .revoked(false)
-                        .userId(user.getId())
+                .jwtId(refreshToken.getJwtId())
+                .tokenType(TokenType.REFRESH)
+                .timeToLive(refreshToken.getSecondsTtl())
+                .revoked(false)
+                .userId(user.getId())
                 .build());
 
         return AuthenticateResponse.builder()
                 .accessToken(accessToken.getValue())
                 .refreshToken(refreshToken.getValue())
                 .build();
+
+    }
+
+    @Override
+    public AuthenticateResponse exchangeOAuthCode(String code) {
+        if (!StringUtils.hasText(code)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        String userId = redisTemplate.opsForValue().getAndDelete("oauth-login:" + code);
+        if (!StringUtils.hasText(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+
+        return issueToken(userId);
     }
 
     @Override
     public AuthenticateResponse refreshToken(String refreshToken) {
-        if(!StringUtils.hasText(refreshToken)) {
+        if (!StringUtils.hasText(refreshToken)) {
             throw new CustomException(ErrorCode.COOKIE_REQUIRED);
         }
         try {
@@ -85,7 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             String jwtId = signedJWT.getJWTClaimsSet().getJWTID();
             Token refresh = tokenRepository.findById(jwtId)
                     .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
-            if(refresh.isRevoked()){
+            if (refresh.isRevoked()) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED);
             }
             List<String> authorities = SecurityUtil.getAuthorities(user);
@@ -100,21 +129,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(String authorizationHeader, String refreshToken) throws ParseException, JOSEException {
-        if(!StringUtils.hasText(refreshToken) || !authorizationHeader.startsWith("Bearer ")) {
+        if (!StringUtils.hasText(refreshToken) || !authorizationHeader.startsWith("Bearer ")) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         String accessToken = authorizationHeader.substring(7);
         SignedJWT signedAccessToken = SignedJWT.parse(accessToken);
         TokenType tokenType = TokenType.valueOf(signedAccessToken.getJWTClaimsSet().getStringClaim("typ"));
         tokenRepository.save(Token.builder()
-                        .jwtId(signedAccessToken.getJWTClaimsSet().getJWTID())
-                        .tokenType(tokenType)
-                        .revoked(true)
-                        .timeToLive(secondsUntil(signedAccessToken.getJWTClaimsSet().getExpirationTime()))
-                        .userId(signedAccessToken.getJWTClaimsSet().getSubject())
+                .jwtId(signedAccessToken.getJWTClaimsSet().getJWTID())
+                .tokenType(tokenType)
+                .revoked(true)
+                .timeToLive(secondsUntil(signedAccessToken.getJWTClaimsSet().getExpirationTime()))
+                .userId(signedAccessToken.getJWTClaimsSet().getSubject())
                 .build());
 
-        if(StringUtils.hasText(refreshToken)){
+        if (StringUtils.hasText(refreshToken)) {
             SignedJWT signedRefreshToken = jwtService.verifyToken(refreshToken, TokenType.REFRESH);
             String jwtId = signedRefreshToken.getJWTClaimsSet().getJWTID();
             Token refresh = tokenRepository.findById(jwtId)
@@ -127,7 +156,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void forgetPassword(String email) {
         var userOptional = userRepository.findByEmail(email);
-        if(userOptional.isEmpty()) {
+        if (userOptional.isEmpty()) {
             return;
         }
         User user = userOptional.get();
@@ -149,7 +178,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void resetPassword(ResetPasswordRequest request)  {
+    public void resetPassword(ResetPasswordRequest request) {
         try {
             SignedJWT signedPassword = jwtService.verifyToken(request.token(), TokenType.RESET_PASSWORD);
             String resetPasswordKey = "reset-password:" + signedPassword.getJWTClaimsSet().getJWTID();
@@ -165,7 +194,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             user.setPassword(passwordEncoder.encode(request.newPassword()));
             userRepository.save(user);
             redisTemplate.delete(resetPasswordKey);
-        }catch (ParseException | JOSEException e) {
+        } catch (ParseException | JOSEException e) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
     }
