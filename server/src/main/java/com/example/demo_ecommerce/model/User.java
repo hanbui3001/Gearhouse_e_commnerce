@@ -47,6 +47,10 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    private Set<Address> addresses = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<SocialAccount> socialAccounts = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

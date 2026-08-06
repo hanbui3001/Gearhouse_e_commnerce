@@ -12,10 +12,13 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Table(name = "addresses")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Address {
+public class Address extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
+    @Column(name = "receiver_name", nullable = false)
+    String receiverName;
 
     @Column(name = "phone_number", nullable = false)
     String phoneNumber;
@@ -32,6 +35,11 @@ public class Address {
     @Column(name = "province", nullable = false)
     String province;
 
-    @Column(name = "is_default")
-    boolean defaultAddress;
+    @Column(name = "is_default", nullable = false)
+    @Builder.Default
+    Boolean isDefault = false;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    User user;
 }

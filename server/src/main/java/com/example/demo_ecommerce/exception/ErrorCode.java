@@ -36,6 +36,7 @@ public enum ErrorCode {
 
     FILE_LIMIT_CAPACITY(500, "File Limit Exceeded", HttpStatus.INTERNAL_SERVER_ERROR),
     UNSUPPORTED_MEDIA_TYPE(500, "Unsupported Media Type", HttpStatus.INTERNAL_SERVER_ERROR),
+    ADDRESS_NOT_FOUND(404, "Address not found", HttpStatus.NOT_FOUND),
     ;
     private int code;
     private String message;
